@@ -82,7 +82,7 @@ class LoggingMiddleware(BaseHTTPMiddleware):
             "client_ip": client_ip,
             "status_code": response.status_code,
             "response_time": f"{process_time:.2f}s",
-            "date": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            "service_date": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         })
 
         return response
