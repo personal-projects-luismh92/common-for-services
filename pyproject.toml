@@ -24,6 +24,10 @@ dependencies = [
 Homepage = "https://github.com/personal-projects-luismh92/common_for_services"
 
 [tool.setuptools]
-packages.find.include = ["src.database"]
-packages.find.exclude = ["tests*", "docs*"]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["database*"]
+exclude = ["tests*", "docs*"]
 

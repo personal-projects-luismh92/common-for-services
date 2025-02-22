@@ -1,20 +1,21 @@
 # common-for-services
 
 ```
-common/
-│── __init__.py
-│── middleware/
-│   │── __init__.py
-│   │── db_transaction.py
-│   │── logging.py
-│   │── authentication.py
-│── database/
-│   │── __init__.py
-│   │── connection.py
-│── utils/
-│   │── __init__.py
-│   │── alerts.py
-│   │── monitoring.py
+common_for_services/
+├── src/
+│    │── __init__.py
+│    │── middleware/
+│    │   │── __init__.py
+│    │   │── db_transaction.py
+│    │   │── logging.py
+│    │   │── authentication.py
+│    │── database/
+│    │   │── __init__.py
+│    │   │── connection.py
+│    │── utils/
+│    │   │── __init__.py
+│    │   │── alerts.py
+│    │   │── monitoring.py
 │── setup.py  # If packaging as an installable module
 ```
 
