@@ -47,10 +47,8 @@ class DBTransactionMiddleware(BaseHTTPMiddleware):
     Raises:
         SQLAlchemyError: If a database transaction error occurs.
     """
-    def __init__(self, database: Session, send_alert_email):
+    def __init__(self):
         """Initializes the database transaction middleware."""
-        _database = database
-        _send_alert_email = send_alert_email
 
     async def dispatch(self, request: Request, call_next):
         """Intercepts and processes incoming requests to ensure transaction safety.
