@@ -25,6 +25,10 @@ python setup.py sdist bdist_wheel
 
 ### Install pakage
 ```
-pip install git+https://github.com/your-org/common-services-miso-uniandes.git
+pip install git+https://github.com/personal-projects-luismh92/common-for-services.git@develop --extra-index-url https://pypi.org/simple
+```
+
+```
+pip install git+https://github.com/personal-projects-luismh92/common-for-services.git
 ```
 
