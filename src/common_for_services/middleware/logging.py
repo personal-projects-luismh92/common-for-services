@@ -20,6 +20,7 @@ Attributes:
 """
 import logging
 import time
+import datetime
 from fastapi import Request
 from starlette.middleware.base import BaseHTTPMiddleware
 
@@ -33,15 +34,18 @@ class LoggingMiddleware(BaseHTTPMiddleware):
     This middleware captures essential request and response details, including:
     - HTTP method (GET, POST, etc.).
     - Request path.
+    - Client IP address.
     - Response status code.
     - Processing time of the request.
 
     The structured logs help in monitoring API performance and diagnosing issues.
 
-    Example log output:
+        Example log output:
         {
+            "event": "http_request",
             "method": "GET",
             "path": "/health",
+            "client_ip": "192.168.1.1",
             "status_code": 200,
             "response_time": "0.02s"
         }
@@ -65,6 +69,8 @@ class LoggingMiddleware(BaseHTTPMiddleware):
         start_time = time.time()  # Start request timer
         response = await call_next(request)  # Process request
         process_time = time.time() - start_time  # Calculate response time
+        if request.client:
+            client_ip = request.client.host  # Extract client IP address
 
         # Log structured request details
         logger.info({
@@ -73,8 +79,10 @@ class LoggingMiddleware(BaseHTTPMiddleware):
             "event": "http/https_request",
             "method": request.method,
             "path": request.url.path,
+            "client_ip": client_ip,
             "status_code": response.status_code,
-            "response_time": f"{process_time:.2f}s"
+            "response_time": f"{process_time:.2f}s",
+            "date": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         })
 
         return response
