@@ -87,5 +87,6 @@ class DBTransactionMiddleware(BaseHTTPMiddleware):
             logger.info({
                 "package": "middleware",
                 "modulo": "DBTransactionMiddleware",
+                "event": "db_transaction_complete",
                 "response_time": f"Request processed in {process_time:.2f} seconds"
             })

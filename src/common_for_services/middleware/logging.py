@@ -70,6 +70,7 @@ class LoggingMiddleware(BaseHTTPMiddleware):
         logger.info({
             "package": "middleware",
             "modulo": "LoggingMiddleware",
+            "event": "HTTP Request",
             "method": request.method,
             "path": request.url.path,
             "status_code": response.status_code,
