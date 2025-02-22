@@ -28,6 +28,6 @@ package-dir = { "" = "src" }
 
 [tool.setuptools.packages.find]
 where = ["src"]
-include = ["database*"]
+include = ["common_for_services.database*"]
 exclude = ["tests*", "docs*"]
 
