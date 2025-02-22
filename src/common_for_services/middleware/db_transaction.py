@@ -93,23 +93,3 @@ class DBTransactionMiddleware(BaseHTTPMiddleware):
                 "modulo": "DBTransactionMiddleware",
                 "response_time": f"Request processed in {process_time:.2f} seconds"
             })
-
-
-    def log_event(self, event_type: str, description: str, db: Session):
-        """Logs an event in the database.
-
-        This function inserts a structured log entry into an `event_log` table
-        whenever a database transaction failure occurs.
-
-        Args:
-            event_type (str): The type of event to be logged.
-            description (str): A detailed description of the event.
-            db (Session): The active database session.
-        """
-        try:
-            db.execute(text("""
-                INSERT INTO event_log (event_type, description, timestamp) VALUES (:event_type, :description, NOW())
-            """), {"event_type": event_type, "description": description})
-            db.commit()
-        except Exception as e:
-            logger.error(f"Error logging event: {str(e)}")
