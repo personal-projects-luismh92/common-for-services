@@ -24,6 +24,7 @@ from fastapi import Request
 from starlette.middleware.base import BaseHTTPMiddleware
 
 # Logger for request monitoring
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger("request_logger")
 
 class LoggingMiddleware(BaseHTTPMiddleware):
