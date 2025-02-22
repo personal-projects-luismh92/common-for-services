@@ -68,22 +68,12 @@ class DBTransactionMiddleware(BaseHTTPMiddleware):
         Returns:
             Response: The HTTP response from the next middleware or endpoint.
         """
-        db = self._database() # Create a new database session 
         start_time = time.time()
-
+        
         try:
-            response = await call_next(request)  # Process request
+            response = await call_next(request)
             return response
         except SQLAlchemyError as e:
-            db.rollback()  # Rollback the transaction on failure
-
-            # Log the error in the database
-            self.log_event("DB_TRANSACTION_ERROR", str(e), db)
-
-            # Send alert to notify of database failure
-            self.send_alert_email("🚨 Database Transaction Failure", f"Error: {str(e)}")
-
-            # Log the structured error message
             logger.error(json.dumps({
                 "event": "db_transaction_error",
                 "error": str(e),
@@ -91,14 +81,18 @@ class DBTransactionMiddleware(BaseHTTPMiddleware):
             }))
 
             return Response(
-                content=json.dumps({"status": "error", "message": "Database error occurred"}),
+                content=json.dumps(
+                    {"status": "error", "message": "Error interno en el sistema"}),
                 media_type="application/json",
                 status_code=500
             )
         finally:
-            db.close()  # Ensure database session is closed after request processing
             process_time = time.time() - start_time
-            logger.info(f"Request processed in {process_time:.2f} seconds")
+            logger.info({
+                "package": "middleware",
+                "modulo": "DBTransactionMiddleware",
+                "response_time": f"Request processed in {process_time:.2f} seconds"
+            })
 
 
     def log_event(self, event_type: str, description: str, db: Session):

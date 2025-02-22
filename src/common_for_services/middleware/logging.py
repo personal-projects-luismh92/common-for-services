@@ -68,6 +68,8 @@ class LoggingMiddleware(BaseHTTPMiddleware):
 
         # Log structured request details
         logger.info({
+            "package": "middleware",
+            "modulo": "LoggingMiddleware",
             "method": request.method,
             "path": request.url.path,
             "status_code": response.status_code,
