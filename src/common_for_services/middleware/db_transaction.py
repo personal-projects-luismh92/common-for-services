@@ -31,7 +31,7 @@ from fastapi import Request, Response, FastAPI
 from starlette.middleware.base import BaseHTTPMiddleware
 from sqlalchemy.exc import SQLAlchemyError
 from typing import Optional
-from tasks.celery_worker import celery  # Injected Celery instance
+from common_for_services.tasks.celery_worker import celery
 
 # Logger for database transaction monitoring
 logger = logging.getLogger("db_transaction_monitoring")
