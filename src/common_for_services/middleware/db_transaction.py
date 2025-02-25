@@ -27,7 +27,7 @@ import logging
 import json
 import time
 import datetime
-from fastapi import Request, Response, FastAPI
+from fastapi import Request, Response, FastAPI, BackgroundTasks
 from starlette.middleware.base import BaseHTTPMiddleware
 from sqlalchemy.exc import SQLAlchemyError
 from common_for_services.services.email_service import EmailService
@@ -91,9 +91,11 @@ class DBTransactionMiddleware(BaseHTTPMiddleware):
 
             # Send email alert for immediate attention
             if self.email_service:
-                self.email_service.send_email(
+                background_tasks = BackgroundTasks()
+                background_tasks.add_task(
+                    self.email_service.send_email,
                     subject="Database Transaction Error",
-                    body=f"An error occurred during a database transaction. Error details: {message}"
+                    body=f"An error occurred during a database transaction.\n\nDetails:\n{json.dumps(message, indent=2)}"
                 )
 
             return Response(
