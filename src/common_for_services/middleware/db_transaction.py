@@ -26,11 +26,12 @@ Exceptions:
 import logging
 import json
 import time
-from fastapi import Request, Response
+import datetime
+from fastapi import Request, Response, FastAPI
 from starlette.middleware.base import BaseHTTPMiddleware
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.orm import Session
-
+from common_for_services.services.email_service import EmailService
+from typing import Optional
 
 # Logger for database transaction monitoring
 logger = logging.getLogger("db_transaction_monitoring")
@@ -47,6 +48,9 @@ class DBTransactionMiddleware(BaseHTTPMiddleware):
     Raises:
         SQLAlchemyError: If a database transaction error occurs.
     """
+    def __init__(self, app: FastAPI, email_service: Optional[EmailService] = None):
+        super().__init__(app)
+        self.email_service = email_service  # Injected EmailService instance
 
 
     async def dispatch(self, request: Request, call_next):
@@ -70,11 +74,27 @@ class DBTransactionMiddleware(BaseHTTPMiddleware):
             response = await call_next(request)
             return response
         except SQLAlchemyError as e:
-            logger.error(json.dumps({
+            process_time = time.time() - start_time
+
+            message = {
+                "package": "middleware",
+                "modulo": "db_transaction.DBTransactionMiddleware",
                 "event": "db_transaction_error",
                 "error": str(e),
-                "path": request.url.path
-            }))
+                "method": request.method,
+                "path": request.url.path,
+                "response_time": f"Request processed in {process_time:.2f} seconds",
+                "event_date": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            }
+
+            logger.error(json.dumps(message))
+
+            # Send email alert for immediate attention
+            if self.email_service:
+                self.email_service.send_email(
+                    subject="Database Transaction Error",
+                    body=f"An error occurred during a database transaction. Error details: {message}"
+                )
 
             return Response(
                 content=json.dumps(
@@ -86,7 +106,11 @@ class DBTransactionMiddleware(BaseHTTPMiddleware):
             process_time = time.time() - start_time
             logger.info({
                 "package": "middleware",
-                "modulo": "DBTransactionMiddleware",
+                "modulo": "db_transaction.DBTransactionMiddleware",
                 "event": "db_transaction_complete",
-                "response_time": f"Request processed in {process_time:.2f} seconds"
+                "error": None,
+                "method": request.method,
+                "path": request.url.path,
+                "response_time": f"Request processed in {process_time:.2f} seconds",
+                "event_date": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             })

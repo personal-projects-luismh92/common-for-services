@@ -75,14 +75,14 @@ class LoggingMiddleware(BaseHTTPMiddleware):
         # Log structured request details
         logger.info({
             "package": "middleware",
-            "modulo": "LoggingMiddleware",
+            "modulo": "logging.LoggingMiddleware",
             "event": "http/https_request",
             "method": request.method,
             "path": request.url.path,
             "client_ip": client_ip,
             "status_code": response.status_code,
             "response_time": f"{process_time:.2f}s",
-            "service_date": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            "event_date": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         })
 
         return response
