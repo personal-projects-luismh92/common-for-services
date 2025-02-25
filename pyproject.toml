@@ -33,5 +33,6 @@ include = [
     "common_for_services.database*",
     "common_for_services.middleware*",
     "common_for_services.notification*",
+    "common_for_services.tasks*",
 ]
 exclude = ["tests*", "docs*"]
