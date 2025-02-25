@@ -27,14 +27,15 @@ import logging
 import json
 import time
 import datetime
-from fastapi import Request, Response, FastAPI, BackgroundTasks
+from fastapi import Request, Response, FastAPI
 from starlette.middleware.base import BaseHTTPMiddleware
 from sqlalchemy.exc import SQLAlchemyError
-from common_for_services.services.email_service import EmailService
 from typing import Optional
+from tasks.celery_worker import celery  # Injected Celery instance
 
 # Logger for database transaction monitoring
 logger = logging.getLogger("db_transaction_monitoring")
+
 
 class DBTransactionMiddleware(BaseHTTPMiddleware):
     """Middleware to monitor database transactions and log failures.
@@ -44,14 +45,15 @@ class DBTransactionMiddleware(BaseHTTPMiddleware):
     - Rolls back the transaction.
     - Logs the error in both the application logs and a dedicated event log table.
     - Sends an email alert for immediate attention.
-    
+
     Raises:
         SQLAlchemyError: If a database transaction error occurs.
     """
-    def __init__(self, app: FastAPI, email_service: Optional[EmailService] = None):
-        super().__init__(app)
-        self.email_service = email_service  # Injected EmailService instance
 
+    def __init__(self, app: FastAPI,
+                 celery_app: Optional[celery] = None):
+        super().__init__(app)
+        self.celery_app = celery_app  # Injected Celery
 
     async def dispatch(self, request: Request, call_next):
         """Intercepts and processes incoming requests to ensure transaction safety.
@@ -69,14 +71,14 @@ class DBTransactionMiddleware(BaseHTTPMiddleware):
             Response: The HTTP response from the next middleware or endpoint.
         """
         start_time = time.time()
-        
+
         try:
             response = await call_next(request)
             return response
         except SQLAlchemyError as e:
             process_time = time.time() - start_time
 
-            message = {
+            log_data = {
                 "package": "middleware",
                 "modulo": "db_transaction.DBTransactionMiddleware",
                 "event": "db_transaction_error",
@@ -87,16 +89,23 @@ class DBTransactionMiddleware(BaseHTTPMiddleware):
                 "event_date": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             }
 
-            logger.error(json.dumps(message))
+            logger.error(json.dumps(log_data))
 
-            # Send email alert for immediate attention
-            if self.email_service:
-                background_tasks = BackgroundTasks()
-                background_tasks.add_task(
-                    self.email_service.send_email,
-                    subject="Database Transaction Error",
-                    body=f"An error occurred during a database transaction.\n\nDetails:\n{json.dumps(message, indent=2)}"
+            if self.celery_app:
+                # Send structured log data to the logging service
+                self.celery_app.send_task("tasks.log_to_logging_service_task", args=[log_data])
+                self.celery_app.send_task(
+                    "tasks.send_email_task",
+                    args=["admin@example.com", "Database Error Alert", json.dumps(log_data, indent=2)]
                 )
+            # # Send email alert for immediate attention
+            # if self.email_service:
+            #     background_tasks = BackgroundTasks()
+            #     background_tasks.add_task(
+            #         self.email_service.send_email,
+            #         subject="Database Transaction Error",
+            #         body=f"An error occurred during a database transaction.\n\nDetails:\n{json.dumps(log_data, indent=2)}"
+            #     )
 
             return Response(
                 content=json.dumps(
