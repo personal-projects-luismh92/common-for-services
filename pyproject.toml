@@ -18,6 +18,7 @@ dependencies = [
     "httpx",
     "starlette",
     "pyjwt",
+    "flower==1.0.0",
     "celery[redis]==5.3.6",
 ]
 
