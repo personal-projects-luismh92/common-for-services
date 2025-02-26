@@ -18,8 +18,9 @@ dependencies = [
     "httpx",
     "starlette",
     "pyjwt",
-    "flower==1.0.0",
+    "flower==2.0.0",
     "celery[redis]==5.3.6",
+    "setuptools",  # Ensure distutils is available
 ]
 
 [project.urls]
