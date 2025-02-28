@@ -80,13 +80,14 @@ class DBTransactionMiddleware(BaseHTTPMiddleware):
 
             log_data = {
                 "package": "middleware",
-                "modulo": "db_transaction.DBTransactionMiddleware",
+                "module": "db_transaction.DBTransactionMiddleware",
+                "log": "CRITICAL",
                 "event": "db_transaction_error",
                 "error": str(e),
                 "method": request.method,
                 "path": request.url.path,
                 "response_time": f"Request processed in {process_time:.2f} seconds",
-                "event_date": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             }
 
             logger.error(json.dumps(log_data))
@@ -98,15 +99,7 @@ class DBTransactionMiddleware(BaseHTTPMiddleware):
                     "celery_worker.tasks.send_email_task",
                     args=["admin@example.com", "Database Error Alert", json.dumps(log_data, indent=2)]
                 )
-            # # Send email alert for immediate attention
-            # if self.email_service:
-            #     background_tasks = BackgroundTasks()
-            #     background_tasks.add_task(
-            #         self.email_service.send_email,
-            #         subject="Database Transaction Error",
-            #         body=f"An error occurred during a database transaction.\n\nDetails:\n{json.dumps(log_data, indent=2)}"
-            #     )
-
+        
             return Response(
                 content=json.dumps(
                     {"status": "error", "message": "Error interno en el sistema"}),
