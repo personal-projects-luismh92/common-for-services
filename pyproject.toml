@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "common_for_services"
+version = "0.0.1"
+description = "Common utilities for services"
+readme = "README.md"
+authors = [
+    { name = "LUIS ALBERTO MENDOZA HERNANDEZ", email = "l.mendoza@uniandes.edu.co" },
+]
+license = { text = "MIT" }
+requires-python = ">=3.8"
+dependencies = [
+    "fastapi",
+    "sqlalchemy",
+    "httpx",
+    "starlette",
+    "pyjwt",
+    "flower==2.0.0",
+    "celery[redis]==5.3.6",
+    "setuptools",
+]
+
+[project.urls]
+Homepage = "https://github.com/personal-projects-luismh92/common_for_services"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = [
+    "common_for_services.database*",
+    "common_for_services.middleware*",
+    "common_for_services.notification*",
+    "common_for_services.tasks*",
+]
+exclude = ["tests*", "docs*"]
