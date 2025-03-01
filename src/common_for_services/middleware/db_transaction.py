@@ -94,12 +94,14 @@ class DBTransactionMiddleware(BaseHTTPMiddleware):
 
             if self.celery_app:
                 # Send structured log data to the logging service
-                self.celery_app.send_task("celery_worker.tasks.log_to_logging_service_task", args=[log_data])
+                self.celery_app.send_task(
+                    "celery_worker.tasks.log_to_logging_service_task", args=[log_data])
                 self.celery_app.send_task(
                     "celery_worker.tasks.send_email_task",
-                    args=["admin@example.com", "Database Error Alert", json.dumps(log_data, indent=2)]
+                    args=["admin@example.com", "Database Error Alert",
+                          json.dumps(log_data, indent=2)]
                 )
-        
+
             return Response(
                 content=json.dumps(
                     {"status": "error", "message": "Error interno en el sistema"}),
@@ -108,13 +110,15 @@ class DBTransactionMiddleware(BaseHTTPMiddleware):
             )
         finally:
             process_time = time.time() - start_time
+
             logger.info({
                 "package": "middleware",
-                "modulo": "db_transaction.DBTransactionMiddleware",
+                "module": "db_transaction.DBTransactionMiddleware",
+                "log": "CRITICAL",
                 "event": "db_transaction_complete",
                 "error": None,
                 "method": request.method,
                 "path": request.url.path,
                 "response_time": f"Request processed in {process_time:.2f} seconds",
-                "event_date": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             })
