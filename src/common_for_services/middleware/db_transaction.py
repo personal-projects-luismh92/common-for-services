@@ -114,7 +114,7 @@ class DBTransactionMiddleware(BaseHTTPMiddleware):
             logger.info({
                 "package": "middleware",
                 "module": "db_transaction.DBTransactionMiddleware",
-                "log": "CRITICAL",
+                "log": "INFO",
                 "event": "db_transaction_complete",
                 "error": None,
                 "method": request.method,
