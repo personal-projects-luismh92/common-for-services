@@ -13,6 +13,8 @@ celery = Celery(
     include=["celery_worker.email_tasks", "celery_worker.logging_tasks"]  # 👈 Ensures tasks are registered
 )
 
+celery.autodiscover_tasks(["celery_worker"])
+
 celery.conf.update(
     task_routes={
         "celery_worker.email_tasks.send_email_task": {"queue": "email_queue"},
