@@ -10,7 +10,7 @@ celery = Celery(
     "tasks",
     broker=CELERY_BROKER_URL,
     backend=CELERY_RESULT_BACKEND,  # Optional: Store task results
-    include=["celery_worker.tasks"]  # 👈 Ensures tasks are registered
+    include=["celery_worker.email_tasks", "celery_worker.logging_tasks"]  # 👈 Ensures tasks are registered
 )
 
 celery.conf.update(
