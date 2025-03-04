@@ -7,17 +7,16 @@ CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "redis://localhost:6379/0")
 
 # Initialize Celery
 celery = Celery(
-    "celery_worker",
+    "tasks",
     broker=CELERY_BROKER_URL,
-    backend=CELERY_RESULT_BACKEND,
+    backend=CELERY_RESULT_BACKEND,  # Optional: Store task results
+    include=["celery_worker.tasks"]  # 👈 Ensures tasks are registered
 )
-
-celery.autodiscover_tasks(["celery_worker"])
 
 celery.conf.update(
     task_routes={
-        "celery_worker.email_tasks.send_email_task": {"queue": "email_queue"},
-        "celery_worker.logging_tasks.log_to_logging_service_task": {"queue": "logging_queue"},
+        "celery_worker.tasks.send_email_task": {"queue": "email_queue"},
+        "celery_worker.tasks.log_to_logging_service_task": {"queue": "logging_queue"},
     },
     result_expires=3600,  # Expire results after 1 hour
 )
