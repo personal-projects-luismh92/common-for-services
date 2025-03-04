@@ -15,8 +15,8 @@ celery = Celery(
 
 celery.conf.update(
     task_routes={
-        "celery_worker.email_tasks.send_email_task": {"queue": "email_queue"},
-        "celery_worker.logging_tasks.log_to_logging_service_task": {"queue": "logging_queue"},
+        "celery_worker.task.send_email_task": {"queue": "email_queue"},
+        "celery_worker.task.log_to_logging_service_task": {"queue": "logging_queue"},
     },
     result_expires=3600,  # Expire results after 1 hour
 )
