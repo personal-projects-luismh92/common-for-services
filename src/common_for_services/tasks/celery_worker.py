@@ -9,8 +9,7 @@ CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "redis://localhost:6379/0")
 celery = Celery(
     "celery_worker",
     broker=CELERY_BROKER_URL,
-    backend=CELERY_RESULT_BACKEND,  # Optional: Store task results
-    include=["celery_worker.email_tasks", "celery_worker.logging_tasks"]  # 👈 Ensures tasks are registered
+    backend=CELERY_RESULT_BACKEND,
 )
 
 celery.autodiscover_tasks(["celery_worker"])
