@@ -42,7 +42,7 @@ class EmailService:
                 server.sendmail(self.smtp_username,
                                 self.admin_email, msg.as_string())
 
-            logger.info(f"Error email sent to {self.admin_email}")
+            logger.info(f"Email was sent to {self.admin_email}")
 
         except Exception as e:
             logger.critical(f"Failed to send error email: {e}")
@@ -58,7 +58,7 @@ class EmailBodyCommand:
     def format_body(self) -> str:
         """Formats the email body in a structured way."""
         details_str = "\n".join(
-            [f"- {key}: {value}" for key, value in self.details.items()])
+            [f"- {key}: {value} \n" for key, value in self.details.items()])
         return f"""\
         
         🚨{self.message}🚨
