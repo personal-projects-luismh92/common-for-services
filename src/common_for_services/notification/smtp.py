@@ -22,7 +22,7 @@ class EmailService:
         self.smtp_password = os.getenv("SMTP_PASSWORD", "your_email_password")
         self.admin_email = os.getenv("ADMIN_EMAIL", "admin_role@example.com")
 
-    def send_email(self, subject: str, message: str, details: str):
+    def send_email(self, subject: str, message: str, details: dict):
         """Sends an email with the given subject and body."""
         try:
             body_command = EmailBodyCommand(
