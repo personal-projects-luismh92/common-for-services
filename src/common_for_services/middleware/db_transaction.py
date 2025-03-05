@@ -98,7 +98,7 @@ class DBTransactionMiddleware(BaseHTTPMiddleware):
                     "celery_worker.tasks.log_to_logging_service_task", args=[log_data])
                 self.celery_app.send_task(
                     "celery_worker.tasks.send_email_task",
-                    args=["admin@example.com", "Database Error Alert",
+                    args=["Database Error Alert", "A critical database error occurred in the system.",
                           json.dumps(log_data, indent=2)]
                 )
 
