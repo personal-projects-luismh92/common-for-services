@@ -94,13 +94,16 @@ class DBTransactionMiddleware(BaseHTTPMiddleware):
 
             if self.celery_app:
                 # Send structured log data to the logging service
+                logger.info("Sending database error to logging service ======================")
                 self.celery_app.send_task(
                     "celery_worker.tasks.log_to_logging_service_task", args=[log_data])
+                logger.info("Sending database error alert email ======================")
                 self.celery_app.send_task(
                     "celery_worker.tasks.send_email_task",
                     args=["Database Error Alert", "A critical database error occurred in the system.",
                           json.dumps(log_data, indent=2)]
                 )
+                logger.info("Database error alert sent successfully ======================")
 
             return Response(
                 content=json.dumps(
